@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeChronicle - Blog Technique IA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="Blog technique automatisé par Intelligence Artificielle, dédié aux sujets de développement et technologies">
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>CodeChronicle</h1>
+        <p class="tagline">Blog technique automatisé par Intelligence Artificielle</p>
+    </div>
+</header>
+
+<nav>
+    <div class="container">
+        <ul>
+            <li><a href="index.html" class="active">Accueil</a></li>
+            <li><a href="#about">À propos</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <section class="featured-article">
+            <h2>Article à la une</h2>
+            <!-- L'article le plus récent sera affiché ici -->
+            {{featured_article}}
+        </section>
+
+        <section class="articles">
+            <h2>Articles Récents</h2>
+            <div class="article-grid">
+                {{articles}}
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>À propos de CodeChronicle</h2>
+            <p>CodeChronicle est un blog technique où tous les articles sont générés par Intelligence Artificielle.
+                Notre mission est d'explorer comment l'IA peut créer du contenu technique de qualité et informatif
+                tout en explorant les frontières de l'automatisation du contenu.</p>
+
+            <p>Notre blog couvre des sujets variés dans le domaine du développement logiciel,
+                des technologies émergentes, et des bonnes pratiques de programmation.</p>
+        </section>
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>Vous avez des questions ou des suggestions ? Contactez-nous à <a href="mailto:contact@codechronicle.example">contact@codechronicle.example</a></p>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2025 CodeChronicle - Blog technique automatisé par IA</p>
+        <div class="social">
+            <a href="#" title="Twitter">Twitter</a>
+            <a href="#" title="GitHub">GitHub</a>
+            <a href="#" title="LinkedIn">LinkedIn</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

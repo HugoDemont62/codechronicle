@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - CodeChronicle</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <meta name="description" content="{{summary}}">
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>CodeChronicle</h1>
+        <p class="tagline">Blog technique automatisé par Intelligence Artificielle</p>
+    </div>
+</header>
+
+<nav>
+    <div class="container">
+        <ul>
+            <li><a href="../index.html">Accueil</a></li>
+            <li><a href="../index.html#about">À propos</a></li>
+            <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <article class="blog-post">
+            <header class="article-header">
+                <h1>{{title}}</h1>
+                <div class="meta">
+                    <span class="date">Publié le {{date}}</span>
+                    <div class="tags">{{tags}}</div>
+                </div>
+                <div class="summary">
+                    <p><strong>Résumé:</strong> {{summary}}</p>
+                </div>
+            </header>
+
+            <div class="content">
+                {{content}}
+            </div>
+
+            <footer class="article-footer">
+                <div class="article-meta">
+                    <p>Cet article a été généré automatiquement par Intelligence Artificielle dans le cadre du projet CodeChronicle.</p>
+                </div>
+
+                <div class="share">
+                    <h3>Partager cet article</h3>
+                    <ul>
+                        <li><a href="https://twitter.com/intent/tweet?text={{title}}&url={{current_url}}" target="_blank" rel="noopener">Twitter</a></li>
+                        <li><a href="https://www.linkedin.com/shareArticle?mini=true&url={{current_url}}&title={{title}}&summary={{summary}}" target="_blank" rel="noopener">LinkedIn</a></li>
+                    </ul>
+                </div>
+            </footer>
+        </article>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2025 CodeChronicle - Blog technique automatisé par IA</p>
+        <div class="social">
+            <a href="#" title="Twitter">Twitter</a>
+            <a href="#" title="GitHub">GitHub</a>
+            <a href="#" title="LinkedIn">LinkedIn</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
