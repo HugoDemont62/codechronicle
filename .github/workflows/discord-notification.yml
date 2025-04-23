@@ -61,7 +61,7 @@ jobs:
                   
                   curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
                     -H "Content-Type: application/json" \
-                    -d "{\"content\": \"$DISCORD_MESSAGE\", \"username\": \"CodeChronicle Bot\"}"
+                    -d "{\"content\": \"$DISCORD_MESSAGE\", \"username\": \"Gros sac orange\"}"
 
             - name: Send notification for direct push
               if: github.event_name == 'push'
@@ -83,4 +83,4 @@ jobs:
                   
                   curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
                     -H "Content-Type: application/json" \
-                    -d "{\"content\": \"$DISCORD_MESSAGE\", \"username\": \"CodeChronicle Bot\"}"
+                    -d "{\"content\": \"$DISCORD_MESSAGE\", \"username\": \"Gros sac orange\"}"
