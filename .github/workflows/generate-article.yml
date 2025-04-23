@@ -30,10 +30,41 @@ jobs:
               run: npm ci
 
             - name: Generate article
-              run: node scripts/generate-article.js "${{ github.event.inputs.topic }}"
+              id: generate-article
+              run: |
+                  # Générer l'article
+                  node scripts/generate-article.js "${{ github.event.inputs.topic }}"
+                  
+                  # Trouver le fichier généré le plus récent
+                  LATEST_ARTICLE=$(find blog -type f -name "*.md" -printf "%T@ %p\n" | sort -nr | head -1 | cut -d' ' -f2-)
+                  
+                  # Extraire le titre depuis le frontmatter YAML
+                  ARTICLE_TITLE=$(grep -m 1 "title:" $LATEST_ARTICLE | sed 's/title: *//' | tr -d "'" | tr -d '"')
+                  
+                  # Stocker le titre et le chemin du fichier pour les étapes suivantes
+                  echo "article_title=$ARTICLE_TITLE" >> $GITHUB_OUTPUT
+                  echo "article_path=$LATEST_ARTICLE" >> $GITHUB_OUTPUT
               env:
                   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
                   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
             - name: Build site
               run: npm run build
+
+            - name: Create Pull Request
+              uses: peter-evans/create-pull-request@v5
+              with:
+                  token: ${{ secrets.PAT_GITHUB }}   # Utilisez votre token PAT ici
+                  commit-message: "feat: add article '${{ steps.generate-article.outputs.article_title }}'"
+                  branch: "article/${{ github.run_id }}"
+                  title: "✨ Nouvel article: ${{ steps.generate-article.outputs.article_title }}"
+                  body: |
+                      Cet article a été généré automatiquement via le workflow GitHub Actions.
+                      
+                      **Sujet demandé:** ${{ github.event.inputs.topic }}
+                      **Titre final:** ${{ steps.generate-article.outputs.article_title }}
+                      **Fichier:** ${{ steps.generate-article.outputs.article_path }}
+                      **Tags:** ${{ github.event.inputs.tags }}
+                      
+                      Veuillez vérifier le contenu et apporter les modifications nécessaires avant de fusionner.
+                  labels: "article, automated"
