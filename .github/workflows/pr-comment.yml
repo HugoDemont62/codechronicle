@@ -1,0 +1,73 @@
+name: PR Comment
+
+on:
+    pull_request:
+        types: [opened, reopened, synchronize]
+        paths:
+            - 'blog/**'
+
+jobs:
+    pr-comment:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - name: Get changed files
+              id: changed-files
+              uses: tj-actions/changed-files@v40
+              with:
+                  files: blog/**/*.md
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Generate PR comment
+              if: steps.changed-files.outputs.any_changed == 'true'
+              id: generate-comment
+              run: |
+                  echo "Fichiers modifiés:" > pr_comment.md
+                  echo "" >> pr_comment.md
+                  
+                  for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+                    echo "- ✏️ \`$file\`" >> pr_comment.md
+                  done
+                  
+                  echo "" >> pr_comment.md
+                  echo "### ✅ Vérifications à effectuer:" >> pr_comment.md
+                  echo "" >> pr_comment.md
+                  echo "- [ ] Le contenu est techniquement correct" >> pr_comment.md
+                  echo "- [ ] Le style d'écriture est cohérent avec la ligne éditoriale" >> pr_comment.md
+                  echo "- [ ] Les liens et références sont valides" >> pr_comment.md
+                  echo "- [ ] Le formatage Markdown est correct" >> pr_comment.md
+                  echo "- [ ] Les tags sont pertinents" >> pr_comment.md
+                  echo "" >> pr_comment.md
+                  echo "Une fois ces vérifications effectuées, vous pouvez fusionner cette PR." >> pr_comment.md
+                  
+                  # Créer une variable avec le contenu du commentaire
+                  PR_COMMENT=$(cat pr_comment.md)
+                  echo "comment<<EOF" >> $GITHUB_OUTPUT
+                  echo "$PR_COMMENT" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
+
+            - name: Add comment to PR
+              if: steps.changed-files.outputs.any_changed == 'true'
+              uses: actions/github-script@v6
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const comment = `${{ steps.generate-comment.outputs.comment }}`;
+                      await github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: comment
+                      });

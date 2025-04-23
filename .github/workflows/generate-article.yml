@@ -1,0 +1,55 @@
+name: Generate Article
+
+on:
+    workflow_dispatch:
+        inputs:
+            topic:
+                description: 'Sujet de l''article à générer'
+                required: true
+                type: string
+            tags:
+                description: 'Tags de l''article (séparés par des virgules)'
+                required: false
+                type: string
+                default: 'ia, technologie'
+
+jobs:
+    generate:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Generate article
+              run: node scripts/generate-article.js "${{ github.event.inputs.topic }}"
+              env:
+                  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+                  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+            - name: Build site
+              run: npm run build
+
+            - name: Create Pull Request
+              uses: peter-evans/create-pull-request@v5
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  commit-message: "feat: add article on ${{ github.event.inputs.topic }}"
+                  branch: "article/${{ github.run_id }}"
+                  title: "✨ Nouvel article: ${{ github.event.inputs.topic }}"
+                  body: |
+                      Cet article a été généré automatiquement via le workflow GitHub Actions.
+                      
+                      **Sujet:** ${{ github.event.inputs.topic }}
+                      **Tags:** ${{ github.event.inputs.tags }}
+                      
+                      Veuillez vérifier le contenu et apporter les modifications nécessaires avant de fusionner.
+                  labels: "article, automated"
