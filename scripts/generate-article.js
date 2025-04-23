@@ -76,7 +76,7 @@ async function generateContentWithAI(topic) {
   `;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4-turbo",
+    model: "gpt-4.1",
     messages: [
       { role: "system", content: "Tu es un expert en technologies qui écrit des articles techniques de haute qualité pour un blog spécialisé." },
       { role: "user", content: prompt }

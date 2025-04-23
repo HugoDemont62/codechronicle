@@ -19,31 +19,29 @@ jobs:
               id: changed-files
               uses: tj-actions/changed-files@v40
               with:
-                  files: "blog/**/*.md"  # Assurez-vous que c'est entre guillemets
+                  files: "blog/**/*.md"
 
-            - name: Create comment body
+            - name: Create comment file
               if: steps.changed-files.outputs.any_changed == 'true'
-              id: create-comment
               run: |
-                  echo 'COMMENT<<EOF' >> $GITHUB_ENV
-                  echo '## Fichiers modifiés:' >> $GITHUB_ENV
-                  echo '' >> $GITHUB_ENV
+                  # Écrire le commentaire dans un fichier
+                  echo "## Fichiers modifiés:" > comment.md
+                  echo "" >> comment.md
                   
                   for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-                    echo "- ✏️ \`$file\`" >> $GITHUB_ENV
+                    echo "- ✏️ \`$file\`" >> comment.md
                   done
                   
-                  echo '' >> $GITHUB_ENV
-                  echo '### ✅ Vérifications à effectuer:' >> $GITHUB_ENV
-                  echo '' >> $GITHUB_ENV
-                  echo '- [ ] Le contenu est techniquement correct' >> $GITHUB_ENV
-                  echo '- [ ] Le style d\'écriture est cohérent avec la ligne éditoriale' >> $GITHUB_ENV
-                  echo '- [ ] Les liens et références sont valides' >> $GITHUB_ENV
-                  echo '- [ ] Le formatage Markdown est correct' >> $GITHUB_ENV
-                  echo '- [ ] Les tags sont pertinents' >> $GITHUB_ENV
-                  echo '' >> $GITHUB_ENV
-                  echo 'Une fois ces vérifications effectuées, vous pouvez fusionner cette PR.' >> $GITHUB_ENV
-                  echo 'EOF' >> $GITHUB_ENV
+                  echo "" >> comment.md
+                  echo "### ✅ Vérifications à effectuer:" >> comment.md
+                  echo "" >> comment.md
+                  echo "- [ ] Le contenu est techniquement correct" >> comment.md
+                  echo "- [ ] Le style d'écriture est cohérent avec la ligne éditoriale" >> comment.md
+                  echo "- [ ] Les liens et références sont valides" >> comment.md
+                  echo "- [ ] Le formatage Markdown est correct" >> comment.md
+                  echo "- [ ] Les tags sont pertinents" >> comment.md
+                  echo "" >> comment.md
+                  echo "Une fois ces vérifications effectuées, vous pouvez fusionner cette PR." >> comment.md
 
             - name: Add comment to PR
               if: steps.changed-files.outputs.any_changed == 'true'
@@ -51,7 +49,8 @@ jobs:
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
-                      const commentBody = process.env.COMMENT;
+                      const fs = require('fs');
+                      const commentBody = fs.readFileSync('comment.md', 'utf8');
                       
                       await github.rest.issues.createComment({
                         issue_number: context.issue.number,
