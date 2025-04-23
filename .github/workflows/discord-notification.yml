@@ -71,6 +71,17 @@ jobs:
                     echo "has_article=false" >> $GITHUB_OUTPUT
                   fi
 
+            # Ajoutons ici une étape de déploiement FTP
+            - name: Deploy to FTP
+              if: github.event.pull_request.merged == true || github.event_name == 'push'
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+              with:
+                  server: ${{ secrets.FTP_SERVER }}
+                  username: ${{ secrets.FTP_USERNAME }}
+                  password: ${{ secrets.FTP_PASSWORD }}
+                  local-dir: ./public/
+                  server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
+
             - name: Send notification for PR merge
               if: github.event.pull_request.merged == true && steps.article-info.outputs.has_article == 'true'
               run: |
@@ -83,10 +94,10 @@ jobs:
                   curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
                     -H "Content-Type: application/json" \
                     -d '{
-                      "content": "🎉 **PR #'"$PR_NUMBER"' fusionnée!**",
+                      "content": "🎉 **PR #'"$PR_NUMBER"' fusionnée et site déployé!**",
                       "embeds": [{
                         "title": "'"$ARTICLE_TITLE"'",
-                        "description": "Un nouvel article a été ajouté au blog.",
+                        "description": "Le nouvel article est maintenant disponible sur le site.",
                         "url": "'"$ARTICLE_URL"'",
                         "color": 5814783,
                         "fields": [
@@ -119,7 +130,7 @@ jobs:
                   curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
                     -H "Content-Type: application/json" \
                     -d '{
-                      "content": "📢 **Nouveau commit sur main**",
+                      "content": "📢 **Nouveau commit sur main et site déployé**",
                       "embeds": [{
                         "title": "'"$ARTICLE_TITLE"'",
                         "description": "'"$COMMIT_MSG"'",
@@ -153,14 +164,14 @@ jobs:
                     PR_NUMBER="${{ github.event.pull_request.number }}"
                     PR_URL="${{ github.event.pull_request.html_url }}"
                   
-                    DISCORD_MESSAGE="🎉 **PR #$PR_NUMBER fusionnée**: $PR_TITLE"
+                    DISCORD_MESSAGE="🎉 **PR #$PR_NUMBER fusionnée et site déployé**: $PR_TITLE"
                     DISCORD_MESSAGE="$DISCORD_MESSAGE\n📝 [Voir la PR]($PR_URL)"
                   else
                     # Notification pour un push direct
                     COMMIT_MSG="${{ github.event.head_commit.message }}"
                     COMMIT_URL="${{ github.event.head_commit.url }}"
                   
-                    DISCORD_MESSAGE="📢 **Nouveau commit sur main**: $COMMIT_MSG"
+                    DISCORD_MESSAGE="📢 **Nouveau commit sur main et site déployé**: $COMMIT_MSG"
                     DISCORD_MESSAGE="$DISCORD_MESSAGE\n📝 [Voir le commit]($COMMIT_URL)"
                   fi
                   

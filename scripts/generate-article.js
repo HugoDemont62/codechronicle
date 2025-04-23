@@ -76,7 +76,8 @@ async function generateArticle() {
     if (process.env.DISCORD_WEBHOOK_URL) {
       await sendDiscordNotification(process.env.DISCORD_WEBHOOK_URL, {
         content: `📝 **Nouvel article généré !**`,
-        article: article
+        article: article,
+        deployed: false // Indiquer que l'article n'est pas encore déployé
       });
     }
 

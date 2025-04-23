@@ -45,48 +45,16 @@ jobs:
                   ARTICLE_FILENAME=$(basename "$LATEST_ARTICLE")
                   ARTICLE_SLUG=$(echo "$ARTICLE_FILENAME" | sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}-(.*)\.md$/\1/')
                   
-                  # Construire l'URL de l'article
-                  ARTICLE_URL="http://codechroniclehd.great-site.net/articles/${ARTICLE_SLUG}.html"
-                  
                   # Stocker ces informations pour les étapes suivantes
                   echo "article_title=$ARTICLE_TITLE" >> $GITHUB_OUTPUT
                   echo "article_path=$LATEST_ARTICLE" >> $GITHUB_OUTPUT
                   echo "article_slug=$ARTICLE_SLUG" >> $GITHUB_OUTPUT
-                  echo "article_url=$ARTICLE_URL" >> $GITHUB_OUTPUT
               env:
                   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
                   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
             - name: Build site
               run: npm run build
-
-            - name: Send additional Discord notification with URL
-              if: env.DISCORD_WEBHOOK_URL != ''
-              run: |
-                  ARTICLE_TITLE="${{ steps.generate-article.outputs.article_title }}"
-                  ARTICLE_URL="${{ steps.generate-article.outputs.article_url }}"
-                  
-                  curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
-                    -H "Content-Type: application/json" \
-                    -d '{
-                      "content": "🚀 **Site mis à jour !**",
-                      "embeds": [{
-                        "title": "'"$ARTICLE_TITLE"'",
-                        "description": "L'"'"'article a été généré et le site a été reconstruit.",
-                        "color": 5814783,
-                        "fields": [
-                          {
-                            "name": "Voir l'"'"'article",
-                            "value": "'"$ARTICLE_URL"'",
-                            "inline": false
-                          }
-                        ],
-                        "footer": {
-                          "text": "CodeChronicle - Blog technique automatisé par IA"
-                        }
-                      }],
-                      "username": "CodeChronicle Bot"
-                    }'
 
             - name: Create Pull Request
               uses: peter-evans/create-pull-request@v5
@@ -103,7 +71,7 @@ jobs:
                       **Fichier:** ${{ steps.generate-article.outputs.article_path }}
                       **Tags:** ${{ github.event.inputs.tags }}
                       
-                      📝 **[Lire l'article sur le site](${{ steps.generate-article.outputs.article_url }})**
+                      > **Note:** Le lien vers l'article sera disponible une fois la PR fusionnée et le site déployé.
                       
                       Veuillez vérifier le contenu et apporter les modifications nécessaires avant de fusionner.
                   labels: "article, automated"

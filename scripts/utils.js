@@ -23,7 +23,6 @@ async function sendDiscordNotification(webhookUrl, options) {
     // Configuration de base pour tous les messages
     const payload = {
       username: options.username || 'Gros sac orange',
-      avatar_url: options.avatar || 'https://i.imgur.com/6vYNJUQ.png', // Vous pouvez changer cette URL pour votre propre avatar
       content: options.content || ''
     };
 
@@ -35,19 +34,16 @@ async function sendDiscordNotification(webhookUrl, options) {
     else if (options.article) {
       const article = options.article;
       const slug = article.slug || slugify(article.title, { lower: true, strict: true });
-      const articleUrl = `http://codechroniclehd.great-site.net/articles/${slug}.html`;
 
+      // On n'inclut pas l'URL de l'article lors de la génération initiale
+      // car le site n'est pas encore déployé
       const embed = {
         title: article.title || 'Nouvel article',
-        description: article.summary || 'Un nouvel article a été publié sur CodeChronicle',
-        url: articleUrl,
+        description: article.summary || 'Un nouvel article a été généré pour CodeChronicle',
         color: 3447003, // Couleur bleue, vous pouvez modifier cette valeur
         timestamp: new Date().toISOString(),
         footer: {
           text: 'CodeChronicle - Blog technique automatisé par IA'
-        },
-        thumbnail: {
-          url: 'https://i.imgur.com/6vYNJUQ.png' // Vous pouvez changer cette URL pour un logo spécifique
         },
         fields: []
       };
@@ -74,12 +70,23 @@ async function sendDiscordNotification(webhookUrl, options) {
         });
       }
 
-      // Ajouter le lien vers l'article
-      embed.fields.push({
-        name: 'Lien vers l\'article',
-        value: `[Lire l'article complet](${articleUrl})`,
-        inline: false
-      });
+      // Si l'article est déjà déployé et que l'URL est fournie, l'ajouter
+      if (options.deployed && article.slug) {
+        const articleUrl = `http://codechroniclehd.great-site.net/articles/${slug}.html`;
+        embed.url = articleUrl;
+        embed.fields.push({
+          name: 'Lien vers l\'article',
+          value: `[Lire l'article complet](${articleUrl})`,
+          inline: false
+        });
+      } else {
+        // Sinon, indiquer que l'article sera bientôt disponible
+        embed.fields.push({
+          name: 'Status',
+          value: 'L\'article sera disponible après fusion de la PR et déploiement du site.',
+          inline: false
+        });
+      }
 
       payload.embeds = [embed];
     }
