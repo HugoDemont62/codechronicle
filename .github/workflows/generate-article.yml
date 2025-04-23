@@ -13,13 +13,16 @@ on:
                 type: string
                 default: 'ia, technologie'
 
+# Définir les permissions au niveau du workflow
+permissions:
+    # Pour pouvoir faire checkout du code
+    contents: write
+    # Pour pouvoir créer des pull requests
+    pull-requests: write
+
 jobs:
     generate:
         runs-on: ubuntu-latest
-        # Ajouter ces permissions pour permettre la création de pull requests
-        permissions:
-            contents: write
-            pull-requests: write
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
