@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { OpenAI } = require('openai');
 const slugify = require('slugify');
-const axios = require('axios');
+const { sendDiscordNotification, formatDate } = require('./utils');
 
 // Configuration
 require('dotenv').config();
@@ -28,9 +28,33 @@ async function generateArticle() {
     // Générer le contenu via OpenAI
     const articleContent = await generateContentWithAI(topic);
 
+    // Extraire le frontmatter pour récupérer le titre et le résumé
+    const frontmatterMatch = articleContent.match(/^---\n([\s\S]*?)\n---/);
+    const frontmatter = frontmatterMatch ? frontmatterMatch[1] : '';
+
+    let title = topic;
+    let summary = '';
+    let tags = process.argv[3] || 'ia, technologie';
+
+    // Extraire le titre et le résumé du frontmatter
+    const titleMatch = frontmatter.match(/title:\s*["']?(.*?)["']?$/m);
+    if (titleMatch && titleMatch[1]) {
+      title = titleMatch[1].trim();
+    }
+
+    const summaryMatch = frontmatter.match(/summary:\s*["']?(.*?)["']?$/m);
+    if (summaryMatch && summaryMatch[1]) {
+      summary = summaryMatch[1].trim();
+    }
+
+    const tagsMatch = frontmatter.match(/tags:\s*\[(.*?)\]/);
+    if (tagsMatch && tagsMatch[1]) {
+      tags = tagsMatch[1].trim();
+    }
+
     // Créer le fichier avec la date actuelle
     const date = new Date().toISOString().split('T')[0];
-    const slug = slugify(topic, { lower: true, strict: true });
+    const slug = slugify(title, { lower: true, strict: true });
     const filename = `${date}-${slug}.md`;
     const filePath = path.join(__dirname, '../blog', filename);
 
@@ -38,18 +62,44 @@ async function generateArticle() {
     await fs.writeFile(filePath, articleContent);
     console.log(`Article généré avec succès: ${filePath}`);
 
-    // Envoyer une notification Discord si le webhook est configuré
+    // Créer l'objet article pour la notification
+    const article = {
+      title,
+      summary,
+      tags,
+      date,
+      slug,
+      filename
+    };
+
+    // Envoyer une notification Discord améliorée si le webhook est configuré
     if (process.env.DISCORD_WEBHOOK_URL) {
-      await sendDiscordNotification(`📝 Nouvel article généré: **${topic}**`);
+      await sendDiscordNotification(process.env.DISCORD_WEBHOOK_URL, {
+        content: `📝 **Nouvel article généré !**`,
+        article: article
+      });
     }
 
-    return { success: true, filePath, topic };
+    return { success: true, filePath, article };
   } catch (error) {
     console.error('Erreur lors de la génération de l\'article:', error.message);
 
     // Envoyer une notification d'erreur à Discord
     if (process.env.DISCORD_WEBHOOK_URL) {
-      await sendDiscordNotification(`❌ Échec de la génération d'article: **${topic}**\nErreur: ${error.message}`);
+      await sendDiscordNotification(process.env.DISCORD_WEBHOOK_URL, {
+        content: `❌ **Échec de la génération d'article**`,
+        embeds: [{
+          title: `Erreur : ${topic}`,
+          description: `Une erreur est survenue lors de la génération de l'article sur "${topic}"`,
+          color: 15158332, // Rouge
+          fields: [
+            {
+              name: 'Message d\'erreur',
+              value: error.message || 'Erreur inconnue'
+            }
+          ]
+        }]
+      });
     }
 
     return { success: false, error: error.message };
@@ -76,7 +126,7 @@ async function generateContentWithAI(topic) {
   `;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4.1",
+    model: "gpt-4-turbo",
     messages: [
       { role: "system", content: "Tu es un expert en technologies qui écrit des articles techniques de haute qualité pour un blog spécialisé." },
       { role: "user", content: prompt }
@@ -86,22 +136,6 @@ async function generateContentWithAI(topic) {
   });
 
   return response.choices[0].message.content;
-}
-
-// Fonction pour envoyer une notification Discord
-async function sendDiscordNotification(message) {
-  try {
-    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-    if (!webhookUrl) return;
-
-    await axios.post(webhookUrl, {
-      content: message,
-      username: 'CodeChronicle Bot'
-    });
-    console.log('Notification Discord envoyée');
-  } catch (error) {
-    console.error('Erreur lors de l\'envoi de la notification Discord:', error.message);
-  }
 }
 
 // Exécution du script si lancé directement
