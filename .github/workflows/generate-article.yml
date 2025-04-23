@@ -16,6 +16,10 @@ on:
 jobs:
     generate:
         runs-on: ubuntu-latest
+        # Ajouter ces permissions pour permettre la création de pull requests
+        permissions:
+            contents: write
+            pull-requests: write
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
