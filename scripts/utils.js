@@ -15,8 +15,8 @@ async function sendDiscordNotification(webhookUrl, message) {
     }
 
     const payload = typeof message === 'string'
-      ? { content: message, username: 'CodeChronicle Bot' }
-      : { ...message, username: 'CodeChronicle Bot' };
+      ? { content: message, username: 'Gros sac orange' }
+      : { ...message, username: 'Gros sac orange' };
 
     await axios.post(webhookUrl, payload);
     return true;
