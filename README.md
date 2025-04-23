@@ -1,7 +1,5 @@
 # CodeChronicle 🚀
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js CI](https://github.com/username/codechronicle/actions/workflows/generate-article.yml/badge.svg)](https://github.com/username/codechronicle/actions/workflows/generate-article.yml)
 [![GitHub last commit](https://img.shields.io/github/last-commit/username/codechronicle.svg)](https://github.com/username/codechronicle/commits/main)
 [![Discord](https://img.shields.io/badge/Discord-Notifications-7289DA.svg)](https://discord.gg)
 
@@ -61,13 +59,6 @@ codechronicle/
    DISCORD_WEBHOOK_URL=votre-url-webhook
    ```
 
-## 📝 Utilisation
-
-### Générer un article
-```bash
-npm run generate "Sujet de l'article"
-```
-
 ### Construire le site
 ```bash
 npm run build
@@ -83,16 +74,6 @@ Pour générer un article via GitHub Actions, utilisez l'action "Generate Articl
 2. **pr-comment.yml** - Ajoute des commentaires automatiques aux Pull Requests
 3. **discord-notification.yml** - Envoie des notifications Discord lors des événements importants
 
-## 🌐 Déploiement
-
-Le déploiement sur InfinityFree se fait manuellement :
-
-1. Construire le site : `npm run build`
-2. Uploader le contenu du dossier `public/` sur votre hébergement InfinityFree via FTP
-    - Nom d'hôte FTP : généralement `ftpupload.net`
-    - Nom d'utilisateur/mot de passe : ceux fournis par InfinityFree
-    - Dossier distant : généralement `htdocs/`
-
 ## 📜 Gestion des secrets
 
 Les secrets (clé API OpenAI, webhook Discord) sont gérés via GitHub Secrets et ne doivent jamais être commités dans le code source.
@@ -101,17 +82,3 @@ Pour ajouter ces secrets dans votre dépôt GitHub :
 1. Aller dans "Settings" > "Secrets and variables" > "Actions"
 2. Cliquer sur "New repository secret"
 3. Ajouter `OPENAI_API_KEY` et `DISCORD_WEBHOOK_URL` avec leurs valeurs respectives
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
-
-1. Forker le projet
-2. Créer une branche pour votre fonctionnalité (`git checkout -b feature/amazing-feature`)
-3. Commiter vos changements (`git commit -m 'feat: add amazing feature'`)
-4. Pusher vers la branche (`git push origin feature/amazing-feature`)
-5. Ouvrir une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
