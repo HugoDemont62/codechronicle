@@ -186,4 +186,4 @@ jobs:
                   
                   curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
                     -H "Content-Type: application/json" \
-                    -d "{\"content\": \"$DISCORD_MESSAGE\", \"username\": \"CodeChronicle Bot\"}"
+                    -d "{\"content\": \"$DISCORD_MESSAGE\", \"username\": \"Gros sac orange\"}"
