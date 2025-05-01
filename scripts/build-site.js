@@ -60,11 +60,7 @@ async function processArticle(filename) {
 
     // Parser le frontmatter
     const parsed = frontMatter(content);
-    const {title, summary, tags} = parsed.attributes || {};
-    if (!title || !summary) {
-      console.error(`Le fichier ${filename} manque de title ou summary.`);
-      return null;
-    }
+    const {title, summary, tags} = parsed.attributes;
 
     // Extraire la date du nom de fichier (format: YYYY-MM-DD-slug.md)
     const dateMatch = filename.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -188,15 +184,16 @@ async function generateIndexPage(articles) {
 
   // Générer le HTML pour chaque article
   const articlesHtml = articles.map(article => `
-  <article class="article-card">
-    <h3><a href="${article.url}">${article.title || "Titre manquant"}</a></h3>
-    <p class="date">Publié le ${formatDate(article.date)}</p>
-    <p class="summary">${article.summary || "Résumé manquant"}</p>
-    <p class="tags">
-      ${article.tags ? article.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') : ''}
-    </p>
-  </article>
-`).join('');
+    <article class="article-card">
+      <h3><a href="${article.url}">${article.title}</a></h3> <!-- TODO : Corriger le title qui est en undefined -->
+      <p class="date">Publié le ${formatDate(article.date)}</p>
+      <p class="summary">${article.summary}</p>
+      <p class="tags">
+        ${article.tags ? article.tags.map(
+    tag => `<span class="tag">${tag}</span>`).join(' ') : ''}
+      </p>
+    </article>
+  `).join('');
 
   // Remplacer les variables dans le template
   const indexHtml = indexTemplate.replace(/{{articles}}/g, articlesHtml);
