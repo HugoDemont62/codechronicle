@@ -1,3 +1,4 @@
+// Modified version of build-site.js
 const fs = require('fs-extra');
 const path = require('path');
 const frontMatter = require('front-matter');
@@ -7,6 +8,21 @@ const { marked } = require('marked');
 const BLOG_DIR = path.join(__dirname, '../blog');
 const PUBLIC_DIR = path.join(__dirname, '../public');
 const TEMPLATES_DIR = path.join(__dirname, '../templates');
+
+/**
+ * Convertit les délimiteurs code block ```yaml en délimiteurs YAML standard ---
+ * @param {string} content - Contenu du fichier Markdown
+ * @returns {string} - Contenu avec frontmatter standardisé pour la bibliothèque front-matter
+ */
+function standardizeFrontmatter(content) {
+  // Si le contenu commence par ```yaml, le convertir au format standard
+  if (content.startsWith('```yaml')) {
+    return content
+    .replace(/^```yaml\n/, '---\n')
+    .replace(/\n```\n/, '\n---\n');
+  }
+  return content;
+}
 
 // Fonction principale
 async function buildSite() {
@@ -56,7 +72,10 @@ async function buildSite() {
 async function processArticle(filename) {
   try {
     const filePath = path.join(BLOG_DIR, filename);
-    const content = await fs.readFile(filePath, 'utf8');
+    let content = await fs.readFile(filePath, 'utf8');
+
+    // Standardiser le frontmatter si nécessaire
+    content = standardizeFrontmatter(content);
 
     // Parser le frontmatter
     const parsed = frontMatter(content);
@@ -115,13 +134,17 @@ async function processArticle(filename) {
     }
 
     // Remplacer les variables dans le template
-    const tagsHtml = tags ? tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') : '';
+    const tagsHtml = tags ? Array.isArray(tags)
+        ? tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')
+        : `<span class="tag">${tags}</span>`
+      : '';
+
     let articleHtml = articleTemplate
-    .replace(/{{title}}/g, title)
-    .replace(/{{date}}/g, formatDate(date))
-    .replace(/{{tags}}/g, tagsHtml)
-    .replace(/{{summary}}/g, summary)
-    .replace(/{{content}}/g, htmlContent);
+    .replace(/{{title}}/g, title || filename)  // Utiliser le nom du fichier si pas de titre
+      .replace(/{{date}}/g, formatDate(date))
+      .replace(/{{tags}}/g, tagsHtml)
+      .replace(/{{summary}}/g, summary || '')
+      .replace(/{{content}}/g, htmlContent);
 
     // Écrire le fichier HTML dans le dossier public/articles
     const outputPath = path.join(PUBLIC_DIR, 'articles', `${slug}.html`);
@@ -130,10 +153,10 @@ async function processArticle(filename) {
     console.log(`Article traité: ${filename} -> ${outputPath}`);
 
     return {
-      title,
-      summary,
+      title: title || filename.replace(/^\d{4}-\d{2}-\d{2}-(.+)\.md$/, '$1'),
+      summary: summary || '',
       date,
-      tags,
+      tags: tags || [],
       slug,
       url: `articles/${slug}.html`
     };
@@ -182,11 +205,13 @@ async function generateIndexPage(articles) {
   // Générer le HTML pour chaque article
   const articlesHtml = articles.map(article => `
     <article class="article-card">
-      <h3><a href="${article.url}">${article.title}</a></h3>
+      <h3><a href="${article.url}">${article.title || 'Article sans titre'}</a></h3>
       <p class="date">Publié le ${formatDate(article.date)}</p>
-      <p class="summary">${article.summary}</p>
+      <p class="summary">${article.summary || ''}</p>
       <p class="tags">
-        ${article.tags ? article.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') : ''}
+        ${Array.isArray(article.tags)
+    ? article.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')
+    : article.tags ? `<span class="tag">${article.tags}</span>` : ''}
       </p>
     </article>
   `).join('');
