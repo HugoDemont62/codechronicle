@@ -33,7 +33,7 @@ async function sendDiscordNotification(webhookUrl, options) {
     // Sinon, si les données d'article sont fournies, créer un embed automatiquement
     else if (options.article) {
       const article = options.article;
-      const slug = slugify(article.title, { lower: true, strict: true });
+      const slug = article.slug || slugify(article.title, { lower: true, strict: true });
 
       // On n'inclut pas l'URL de l'article lors de la génération initiale
       // car le site n'est pas encore déployé

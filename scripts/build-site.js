@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const frontMatter = require('front-matter');
-const {marked} = require('marked');
+const { marked } = require('marked');
 
 // Configuration
 const BLOG_DIR = path.join(__dirname, '../blog');
@@ -45,10 +45,10 @@ async function buildSite() {
     await generateIndexPage(articles);
 
     console.log('Site construit avec succès dans le dossier public/');
-    return {success: true};
+    return { success: true };
   } catch (error) {
     console.error('Erreur lors de la construction du site:', error.message);
-    return {success: false, error: error.message};
+    return { success: false, error: error.message };
   }
 }
 
@@ -60,7 +60,7 @@ async function processArticle(filename) {
 
     // Parser le frontmatter
     const parsed = frontMatter(content);
-    const {title, summary, tags} = parsed.attributes;
+    const { title, summary, tags } = parsed.attributes;
 
     // Extraire la date du nom de fichier (format: YYYY-MM-DD-slug.md)
     const dateMatch = filename.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -75,8 +75,7 @@ async function processArticle(filename) {
     // Charger le template d'article
     let articleTemplate;
     try {
-      articleTemplate = await fs.readFile(
-        path.join(TEMPLATES_DIR, 'article.html'), 'utf8');
+      articleTemplate = await fs.readFile(path.join(TEMPLATES_DIR, 'article.html'), 'utf8');
     } catch (error) {
       // Si le template n'existe pas, créer un template de base
       articleTemplate = `
@@ -116,13 +115,13 @@ async function processArticle(filename) {
     }
 
     // Remplacer les variables dans le template
-    const tagsHtml = tags ? tags.map(tag => `<span class="tag">${tag}</span>`).
-      join(' ') : '';
-    let articleHtml = articleTemplate.replace(/{{title}}/g, title).
-      replace(/{{date}}/g, formatDate(date)).
-      replace(/{{tags}}/g, tagsHtml).
-      replace(/{{summary}}/g, summary).
-      replace(/{{content}}/g, htmlContent);
+    const tagsHtml = tags ? tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') : '';
+    let articleHtml = articleTemplate
+    .replace(/{{title}}/g, title)
+    .replace(/{{date}}/g, formatDate(date))
+    .replace(/{{tags}}/g, tagsHtml)
+    .replace(/{{summary}}/g, summary)
+    .replace(/{{content}}/g, htmlContent);
 
     // Écrire le fichier HTML dans le dossier public/articles
     const outputPath = path.join(PUBLIC_DIR, 'articles', `${slug}.html`);
@@ -136,11 +135,10 @@ async function processArticle(filename) {
       date,
       tags,
       slug,
-      url: `articles/${slug}.html`,
+      url: `articles/${slug}.html`
     };
   } catch (error) {
-    console.error(`Erreur lors du traitement de l'article ${filename}:`,
-      error.message);
+    console.error(`Erreur lors du traitement de l'article ${filename}:`, error.message);
     return null;
   }
 }
@@ -150,8 +148,7 @@ async function generateIndexPage(articles) {
   // Charger le template d'index
   let indexTemplate;
   try {
-    indexTemplate = await fs.readFile(path.join(TEMPLATES_DIR, 'index.html'),
-      'utf8');
+    indexTemplate = await fs.readFile(path.join(TEMPLATES_DIR, 'index.html'), 'utf8');
   } catch (error) {
     // Si le template n'existe pas, créer un template de base
     indexTemplate = `
@@ -185,12 +182,11 @@ async function generateIndexPage(articles) {
   // Générer le HTML pour chaque article
   const articlesHtml = articles.map(article => `
     <article class="article-card">
-      <h3><a href="${article.url}">${article.title}</a></h3> <!-- TODO : Corriger le title qui est en undefined -->
+      <h3><a href="${article.url}">${article.title}</a></h3>
       <p class="date">Publié le ${formatDate(article.date)}</p>
       <p class="summary">${article.summary}</p>
       <p class="tags">
-        ${article.tags ? article.tags.map(
-    tag => `<span class="tag">${tag}</span>`).join(' ') : ''}
+        ${article.tags ? article.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ') : ''}
       </p>
     </article>
   `).join('');
@@ -311,8 +307,7 @@ async function copyStaticAssets() {
 
     // Vous pouvez ajouter ici d'autres assets comme JavaScript, images, etc.
   } catch (error) {
-    console.error('Erreur lors de la copie des assets statiques:',
-      error.message);
+    console.error('Erreur lors de la copie des assets statiques:', error.message);
   }
 }
 
@@ -323,7 +318,7 @@ function formatDate(dateStr) {
     return date.toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric',
+      year: 'numeric'
     });
   } catch (error) {
     return dateStr;
@@ -332,15 +327,17 @@ function formatDate(dateStr) {
 
 // Exécution du script si lancé directement
 if (require.main === module) {
-  buildSite().then(result => {
+  buildSite()
+  .then(result => {
     if (!result.success) {
       process.exit(1);
     }
-  }).catch(error => {
+  })
+  .catch(error => {
     console.error(error);
     process.exit(1);
   });
 } else {
   // Exportation pour l'utilisation en tant que module
-  module.exports = {buildSite};
+  module.exports = { buildSite };
 }
