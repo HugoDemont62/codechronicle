@@ -44,9 +44,6 @@ jobs:
               id: article-info
               if: steps.changed-files.outputs.any_changed == 'true'
               run: |
-                  # Chercher les fichiers markdown modifiés
-                  MD_FILES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E "blog/.*\.md" || echo "")
-                  
                   if [ -n "$MD_FILES" ]; then
                     MD_FILES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E "blog/.*\.md" || echo "")
                         
