@@ -44,38 +44,33 @@ jobs:
               id: article-info
               if: steps.changed-files.outputs.any_changed == 'true'
               run: |
+                  # Chercher les fichiers markdown modifiés
+                  MD_FILES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E "blog/.*\.md" || echo "")
+                  
                   if [ -n "$MD_FILES" ]; then
-                    MD_FILES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E "blog/.*\.md" || echo "")
-                        
-                    if [ -n "$MD_FILES" ]; then
                     # Prendre le premier fichier markdown trouvé
                     MD_FILE=$(echo "$MD_FILES" | head -n 1)
                     
                     # Extraire le titre depuis le frontmatter YAML
-                    ARTICLE_TITLE=$(grep -m 1 "title:" $MD_FILE | sed 's/title: *//' | tr -d "'" | tr -d '"')
+                    ARTICLE_TITLE=$(grep -m 1 "title:" "$MD_FILE" | sed 's/title: *//' | tr -d "'" | tr -d '"')
                     
                     # Extraire le slug du nom de fichier
                     ARTICLE_FILENAME=$(basename "$MD_FILE")
                     ARTICLE_SLUG=$(echo "$ARTICLE_FILENAME" | sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}-(.*)\.md$/\1/')
-                      
+                    
                     # Construire l'URL de l'article avec l'extension .html
                     ARTICLE_URL="http://codechroniclehd.great-site.net/articles/${ARTICLE_SLUG}.html"
-                  
-                  
-                    # Lignes de débogage pour vérifier les variables
-                    echo "Fichier Markdown: $MD_FILE"
-                    echo "Titre extrait: $ARTICLE_TITLE"
-                    echo "Nom du fichier: $ARTICLE_FILENAME"
-                    echo "Slug extrait: $ARTICLE_SLUG"
-                    echo "URL construite: $ARTICLE_URL"
-                  
+                    
                     # Stocker ces informations pour les étapes suivantes
+                  
+                  
                     echo "has_article=true" >> $GITHUB_OUTPUT
                     echo "article_title=$ARTICLE_TITLE" >> $GITHUB_OUTPUT
                     echo "article_slug=$ARTICLE_SLUG" >> $GITHUB_OUTPUT
                     echo "article_url=$ARTICLE_URL" >> $GITHUB_OUTPUT
                     echo "article_file=$MD_FILE" >> $GITHUB_OUTPUT
                   else
+                  
                     echo "has_article=false" >> $GITHUB_OUTPUT
                   fi
 
