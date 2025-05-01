@@ -1,7 +1,7 @@
 # CodeChronicle 🚀
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/HugoDemont62/codechronicle.svg)](https://github.com/HugoDemont62/codechronicle/commits/master/)
-[![Discord](https://img.shields.io/badge/Discord-Notifications-7289DA.svg)](https://discord.gg)
+![Discord](https://img.shields.io/badge/Discord-Notifications-7289DA.svg)
 
 > Blog technique automatisé par l'Intelligence Artificielle
 
