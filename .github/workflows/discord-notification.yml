@@ -61,6 +61,13 @@ jobs:
                     # Construire l'URL de l'article
                     ARTICLE_URL="http://codechroniclehd.great-site.net/articles/${ARTICLE_SLUG}"
                   
+                    # Lignes de débogage pour vérifier les variables
+                    echo "Fichier Markdown: $MD_FILE"
+                    echo "Titre extrait: $ARTICLE_TITLE"
+                    echo "Nom du fichier: $ARTICLE_FILENAME"
+                    echo "Slug extrait: $ARTICLE_SLUG"
+                    echo "URL construite: $ARTICLE_URL"
+                  
                     # Stocker ces informations pour les étapes suivantes
                     echo "has_article=true" >> $GITHUB_OUTPUT
                     echo "article_title=$ARTICLE_TITLE" >> $GITHUB_OUTPUT
